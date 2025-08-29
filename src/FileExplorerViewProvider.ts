@@ -119,11 +119,14 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                 }
             }
 
+            const showFileSize = vscode.workspace.getConfiguration('myCommander').get('showFileSize', false);
+
             this._view.webview.postMessage({
                 type: 'fileList',
                 files: fileList,
                 currentDir: displayCurrentDir,
                 selectedIndex: selectedIndex,
+                showFileSize: showFileSize, // Pass the setting to the webview
             });
         } catch (e) {
             console.error(e);

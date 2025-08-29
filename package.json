@@ -31,6 +31,16 @@
           "type": "webview"
         }
       ]
+    },
+    "configuration": {
+      "title": "My Commander Configuration",
+      "properties": {
+        "myCommander.showFileSize": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to show file sizes in the file explorer."
+        }
+      }
     }
   },
   "scripts": {

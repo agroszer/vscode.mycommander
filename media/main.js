@@ -10,6 +10,7 @@
     let files = [];
     let renderedFiles = [];
     let selectedIndex = 0;
+    let showFileSizeSetting = false; // New global variable
 
     // Signal that the webview is ready
     vscode.postMessage({ type: 'ready' });
@@ -20,6 +21,7 @@
             case 'fileList':
                 searchBox.value = '';
                 files = message.files;
+                showFileSizeSetting = message.showFileSize; // Store the setting
                 renderFileList(files);
                 currentDirElement.textContent = message.currentDir;
                 if (message.selectedIndex) {
@@ -47,12 +49,15 @@
             nameSpan.className = 'file-name';
             nameSpan.textContent = file.name;
 
-            const sizeSpan = document.createElement('span');
-            sizeSpan.className = 'file-size';
-            sizeSpan.textContent = file.isDirectory ? '' : formatSize(file.size);
-
             listItem.appendChild(nameSpan);
-            listItem.appendChild(sizeSpan);
+
+            if (showFileSizeSetting) { // Conditionally create and append sizeSpan
+                const sizeSpan = document.createElement('span');
+                sizeSpan.className = 'file-size';
+                sizeSpan.textContent = file.isDirectory ? '' : formatSize(file.size);
+                listItem.appendChild(sizeSpan);
+            }
+
             fileList.appendChild(listItem);
         });
         fileList.focus();
