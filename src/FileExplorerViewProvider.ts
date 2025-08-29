@@ -33,26 +33,27 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                     break;
                 }
                 case 'open': {
-                    if (data.fileName === '..') {
-                        this._folderToSelect = path.basename(this._currentDir);
-                        this._currentDir = path.dirname(this._currentDir);
+                    const filePath = path.join(this._currentDir, data.fileName);
+                    const stat = await vscode.workspace.fs.stat(vscode.Uri.file(filePath));
+                    if (stat.type === vscode.FileType.Directory) {
+                        this._currentDir = filePath;
                         this._updateFileList();
                     } else {
-                        const filePath = path.join(this._currentDir, data.fileName);
-                        const stat = await vscode.workspace.fs.stat(vscode.Uri.file(filePath));
-                        if (stat.type === vscode.FileType.Directory) {
-                            this._currentDir = filePath;
-                            this._updateFileList();
-                        } else {
-                            const document = await vscode.workspace.openTextDocument(filePath);
-                            await vscode.window.showTextDocument(document, { preview: false });
-                        }
+                        const document = await vscode.workspace.openTextDocument(filePath);
+                        await vscode.window.showTextDocument(document, { preview: false });
                     }
                     break;
                 }
                 case 'goUp': {
-                    this._folderToSelect = path.basename(this._currentDir);
-                    this._currentDir = path.dirname(this._currentDir);
+                    if (this._currentDir !== this._rootPath) {
+                        this._folderToSelect = path.basename(this._currentDir);
+                        this._currentDir = path.dirname(this._currentDir);
+                        this._updateFileList();
+                    }
+                    break;
+                }
+                case 'goToRoot': {
+                    this._currentDir = this._rootPath;
                     this._updateFileList();
                     break;
                 }
@@ -98,10 +99,6 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                 return a.name.localeCompare(b.name);
             });
 
-            if (this._currentDir !== this._rootPath) {
-                fileList.unshift({ name: '..', isDirectory: true, size: 0 });
-            }
-
             let selectedIndex = 0;
             if (this._folderToSelect) {
                 const index = fileList.findIndex(f => f.name === this._folderToSelect);
@@ -142,8 +139,16 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
 			</head>
 			<body>
                 <div id="header">
-                    <input type="text" id="search-box" placeholder="Search..." />
-                    <div id="current-dir"></div>
+                    <div id="header-row-1">
+                        <div id="nav-buttons">
+                            <button id="go-up-button">..</button>
+                            <button id="go-root-button">/</button>
+                        </div>
+                        <div id="current-dir"></div>
+                    </div>
+                    <div id="header-row-2">
+                        <input type="text" id="search-box" placeholder="Search..." />
+                    </div>
                 </div>
 				<ul id="file-list" tabindex="0"></ul>
 				<script nonce="${nonce}" src="${scriptUriWithCacheBust}"></script>

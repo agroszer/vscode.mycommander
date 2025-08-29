@@ -4,6 +4,8 @@
     const fileList = document.getElementById('file-list');
     const searchBox = document.getElementById('search-box');
     const currentDirElement = document.getElementById('current-dir');
+    const goUpButton = document.getElementById('go-up-button');
+    const goRootButton = document.getElementById('go-root-button');
 
     let files = [];
     let renderedFiles = [];
@@ -16,6 +18,7 @@
         const message = event.data;
         switch (message.type) {
             case 'fileList':
+                searchBox.value = '';
                 files = message.files;
                 renderFileList(files);
                 currentDirElement.textContent = message.currentDir;
@@ -75,6 +78,14 @@
         });
     }
 
+    goUpButton.addEventListener('click', () => {
+        vscode.postMessage({ type: 'goUp' });
+    });
+
+    goRootButton.addEventListener('click', () => {
+        vscode.postMessage({ type: 'goToRoot' });
+    });
+
     fileList.addEventListener('click', e => {
         const clickedItem = e.target.closest('.file-item');
         if (clickedItem) {
@@ -95,6 +106,20 @@
     });
 
     fileList.addEventListener('keydown', e => {
+        if (e.key === 'Backspace') {
+            e.preventDefault();
+            searchBox.value = searchBox.value.slice(0, -1);
+            searchBox.dispatchEvent(new Event('input'));
+            return;
+        }
+
+        if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+            e.preventDefault();
+            searchBox.value += e.key;
+            searchBox.dispatchEvent(new Event('input'));
+            return;
+        }
+
         if (renderedFiles.length === 0) return;
 
         switch (e.key) {
@@ -120,13 +145,35 @@
                     vscode.postMessage({ type: 'open', fileName: selectedFile.name });
                 }
                 break;
+            case 'Escape':
+                e.preventDefault();
+                searchBox.value = '';
+                searchBox.dispatchEvent(new Event('input'));
+                break;
         }
     });
 
     searchBox.addEventListener('input', e => {
+        const previouslySelectedFile = renderedFiles[selectedIndex];
+
         const searchTerm = e.target.value.toLowerCase();
-        const filteredFiles = files.filter(f => f.name.toLowerCase().includes(searchTerm));
+        const filteredFiles = files.filter(f => f.name.toLowerCase().startsWith(searchTerm));
         renderFileList(filteredFiles);
+
+        let newSelectedIndex = -1;
+        if (previouslySelectedFile) {
+            newSelectedIndex = filteredFiles.findIndex(f => f.name === previouslySelectedFile.name);
+        }
+
+        if (newSelectedIndex !== -1) {
+            selectedIndex = newSelectedIndex;
+        } else {
+            selectedIndex = 0;
+        }
+
+        if (filteredFiles.length > 0) {
+            updateSelection();
+        }
     });
 
     // Focus the file list when the webview gains focus
