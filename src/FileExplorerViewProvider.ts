@@ -127,8 +127,6 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
         const scriptUriWithCacheBust = scriptUri.with({ query: `v=${new Date().getTime()}` });
         const styleUriWithCacheBust = styleUri.with({ query: `v=${new Date().getTime()}` });
 
-        const nonce = getNonce();
-
         return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -151,17 +149,8 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                     </div>
                 </div>
 				<ul id="file-list" tabindex="0"></ul>
-				<script nonce="${nonce}" src="${scriptUriWithCacheBust}"></script>
+				<script src="${scriptUriWithCacheBust}"></script>
 			</body>
 			</html>`;
     }
-}
-
-function getNonce() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 32; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
 }
