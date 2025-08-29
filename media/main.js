@@ -1,0 +1,137 @@
+
+(function () {
+    const vscode = acquireVsCodeApi();
+    const fileList = document.getElementById('file-list');
+    const searchBox = document.getElementById('search-box');
+    const currentDirElement = document.getElementById('current-dir');
+
+    let files = [];
+    let renderedFiles = [];
+    let selectedIndex = 0;
+
+    // Signal that the webview is ready
+    vscode.postMessage({ type: 'ready' });
+
+    window.addEventListener('message', event => {
+        const message = event.data;
+        switch (message.type) {
+            case 'fileList':
+                files = message.files;
+                renderFileList(files);
+                currentDirElement.textContent = message.currentDir;
+                if (message.selectedIndex) {
+                    selectedIndex = message.selectedIndex;
+                } else {
+                    selectedIndex = 0;
+                }
+                updateSelection();
+                break;
+        }
+    });
+
+    function renderFileList(filesToRender) {
+        renderedFiles = filesToRender;
+        fileList.innerHTML = '';
+        filesToRender.forEach((file, index) => {
+            const listItem = document.createElement('li');
+            listItem.className = 'file-item';
+            if (file.isDirectory) {
+                listItem.classList.add('directory');
+            }
+            listItem.dataset.index = index;
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'file-name';
+            nameSpan.textContent = file.name;
+
+            const sizeSpan = document.createElement('span');
+            sizeSpan.className = 'file-size';
+            sizeSpan.textContent = file.isDirectory ? '' : formatSize(file.size);
+
+            listItem.appendChild(nameSpan);
+            listItem.appendChild(sizeSpan);
+            fileList.appendChild(listItem);
+        });
+        fileList.focus();
+    }
+
+    function formatSize(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+
+    function updateSelection() {
+        const items = fileList.querySelectorAll('.file-item');
+        items.forEach((item, index) => {
+            if (index === selectedIndex) {
+                item.classList.add('selected');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+    }
+
+    fileList.addEventListener('click', e => {
+        const clickedItem = e.target.closest('.file-item');
+        if (clickedItem) {
+            selectedIndex = parseInt(clickedItem.dataset.index, 10);
+            updateSelection();
+        }
+    });
+
+    fileList.addEventListener('dblclick', e => {
+        const clickedItem = e.target.closest('.file-item');
+        if (clickedItem) {
+            const fileIndex = parseInt(clickedItem.dataset.index, 10);
+            const selectedFile = renderedFiles[fileIndex];
+            if (selectedFile) {
+                vscode.postMessage({ type: 'open', fileName: selectedFile.name });
+            }
+        }
+    });
+
+    fileList.addEventListener('keydown', e => {
+        if (renderedFiles.length === 0) return;
+
+        switch (e.key) {
+            case 'ArrowUp':
+                e.preventDefault();
+                selectedIndex = (selectedIndex > 0) ? selectedIndex - 1 : 0;
+                updateSelection();
+                break;
+            case 'ArrowDown':
+                e.preventDefault();
+                selectedIndex = (selectedIndex < renderedFiles.length - 1) ? selectedIndex + 1 : renderedFiles.length - 1;
+                updateSelection();
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                vscode.postMessage({ type: 'goUp' });
+                break;
+            case 'Enter':
+            case 'ArrowRight':
+                e.preventDefault();
+                const selectedFile = renderedFiles[selectedIndex];
+                if (selectedFile) {
+                    vscode.postMessage({ type: 'open', fileName: selectedFile.name });
+                }
+                break;
+        }
+    });
+
+    searchBox.addEventListener('input', e => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredFiles = files.filter(f => f.name.toLowerCase().includes(searchTerm));
+        renderFileList(filteredFiles);
+    });
+
+    // Focus the file list when the webview gains focus
+    window.addEventListener('focus', () => {
+        fileList.focus();
+    });
+
+}());

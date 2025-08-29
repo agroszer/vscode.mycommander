@@ -1,0 +1,85 @@
+
+body, html {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--vscode-font-family);
+    font-weight: var(--vscode-font-weight);
+    font-size: var(--vscode-font-size);
+    color: var(--vscode-editor-foreground);
+    background-color: var(--vscode-side-bar-background);
+}
+
+#header {
+    padding: 4px;
+    background-color: var(--vscode-side-bar-background);
+    border-bottom: 1px solid var(--vscode-side-bar-border);
+}
+
+#search-box {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--vscode-input-border);
+    background-color: var(--vscode-input-background);
+    color: var(--vscode-input-foreground);
+    padding: 4px;
+}
+
+#search-box:focus {
+    outline: 1px solid var(--vscode-focus-border);
+}
+
+#current-dir {
+    padding: 4px 2px;
+    font-size: 0.9em;
+    color: var(--vscode-description-foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    height: calc(100% - 60px);
+    overflow-y: auto;
+    cursor: default;
+}
+
+#file-list:focus {
+    outline: none;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 8px;
+    white-space: nowrap;
+}
+
+.file-item.directory .file-name {
+    color: var(--vscode-list-active-selection-foreground);
+    font-weight: bold;
+}
+
+.file-item:hover {
+    background-color: var(--vscode-list-hover-background);
+}
+
+.file-item.selected {
+    background-color: rgba(128, 128, 128, 0.2);
+}
+
+.file-name {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.file-size {
+    padding-left: 1em;
+    color: var(--vscode-description-foreground);
+}

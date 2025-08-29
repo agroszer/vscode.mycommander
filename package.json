@@ -9,15 +9,29 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onView:myCommander.fileExplorer"
+  ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "mycommander.helloWorld",
-        "title": "Hello World"
-      }
-    ]
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "my-commander-container",
+          "title": "My Commander",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "my-commander-container": [
+        {
+          "id": "myCommander.fileExplorer",
+          "name": "File Explorer",
+          "type": "webview"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
