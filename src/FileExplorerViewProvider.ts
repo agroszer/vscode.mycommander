@@ -108,10 +108,21 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                 this._folderToSelect = undefined;
             }
 
+            let displayCurrentDir = this._currentDir;
+            if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+                const workspaceRoot = vscode.workspace.workspaceFolders[0].uri.fsPath;
+                if (this._currentDir.startsWith(workspaceRoot)) {
+                    displayCurrentDir = path.relative(workspaceRoot, this._currentDir);
+                    if (displayCurrentDir === '') {
+                        displayCurrentDir = '.'; // Represent workspace root as '.'
+                    }
+                }
+            }
+
             this._view.webview.postMessage({
                 type: 'fileList',
                 files: fileList,
-                currentDir: this._currentDir,
+                currentDir: displayCurrentDir,
                 selectedIndex: selectedIndex,
             });
         } catch (e) {
