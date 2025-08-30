@@ -11,6 +11,7 @@
     let renderedFiles = [];
     let selectedIndex = 0;
     let showFileSizeSetting = false; // New global variable
+    let searchCaseSensitive = false; // New global variable
 
     // Signal that the webview is ready
     vscode.postMessage({ type: 'ready' });
@@ -22,6 +23,7 @@
                 searchBox.value = '';
                 files = message.files;
                 showFileSizeSetting = message.showFileSize; // Store the setting
+                searchCaseSensitive = message.searchCaseSensitive; // Store the setting
                 renderFileList(files);
                 currentDirElement.textContent = message.currentDir;
                 if (message.selectedIndex) {
@@ -161,8 +163,13 @@
     searchBox.addEventListener('input', e => {
         const previouslySelectedFile = renderedFiles[selectedIndex];
 
-        const searchTerm = e.target.value.toLowerCase();
-        const filteredFiles = files.filter(f => f.name.toLowerCase().startsWith(searchTerm));
+        const searchTerm = e.target.value;
+        const filteredFiles = files.filter(f => {
+            if (searchCaseSensitive) {
+                return f.name.startsWith(searchTerm);
+            }
+            return f.name.toLowerCase().startsWith(searchTerm.toLowerCase());
+        });
         renderFileList(filteredFiles);
 
         let newSelectedIndex = -1;

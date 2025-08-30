@@ -39,6 +39,11 @@
           "type": "boolean",
           "default": false,
           "description": "Whether to show file sizes in the file explorer."
+        },
+        "myCommander.searchCaseSensitive": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the search in the file explorer is case sensitive."
         }
       }
     }

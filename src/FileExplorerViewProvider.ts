@@ -120,6 +120,7 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
             }
 
             const showFileSize = vscode.workspace.getConfiguration('myCommander').get('showFileSize', false);
+            const searchCaseSensitive = vscode.workspace.getConfiguration('myCommander').get('searchCaseSensitive', false);
 
             this._view.webview.postMessage({
                 type: 'fileList',
@@ -127,6 +128,7 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                 currentDir: displayCurrentDir,
                 selectedIndex: selectedIndex,
                 showFileSize: showFileSize, // Pass the setting to the webview
+                searchCaseSensitive: searchCaseSensitive,
             });
         } catch (e) {
             console.error(e);
