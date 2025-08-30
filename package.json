@@ -53,6 +53,15 @@
             "search"
           ],
           "description": "The search mode. \"filter\" will only show matching items. \"search\" will show all items and select the first match."
+        },
+        "myCommander.searchMatch": {
+          "type": "string",
+          "default": "startsWith",
+          "enum": [
+            "startsWith",
+            "in"
+          ],
+          "description": "The search match mode. \"startsWith\" will match the beginning of the item name. \"in\" will match anywhere in the item name."
         }
       }
     }

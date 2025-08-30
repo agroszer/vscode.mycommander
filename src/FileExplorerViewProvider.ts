@@ -75,12 +75,14 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
         const showFileSize = vscode.workspace.getConfiguration('myCommander').get('showFileSize', false);
         const searchCaseSensitive = vscode.workspace.getConfiguration('myCommander').get('searchCaseSensitive', false);
         const searchMode = vscode.workspace.getConfiguration('myCommander').get('searchMode', 'filter');
+        const searchMatch = vscode.workspace.getConfiguration('myCommander').get('searchMatch', 'startsWith');
 
         this._view.webview.postMessage({
             type: 'settingsUpdate',
             showFileSize: showFileSize,
             searchCaseSensitive: searchCaseSensitive,
             searchMode: searchMode,
+            searchMatch: searchMatch,
         });
     }
 
@@ -145,6 +147,7 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
             const showFileSize = vscode.workspace.getConfiguration('myCommander').get('showFileSize', false);
             const searchCaseSensitive = vscode.workspace.getConfiguration('myCommander').get('searchCaseSensitive', false);
             const searchMode = vscode.workspace.getConfiguration('myCommander').get('searchMode', 'filter');
+            const searchMatch = vscode.workspace.getConfiguration('myCommander').get('searchMatch', 'startsWith');
 
             this._view.webview.postMessage({
                 type: 'fileList',
@@ -154,6 +157,7 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                 showFileSize: showFileSize, // Pass the setting to the webview
                 searchCaseSensitive: searchCaseSensitive,
                 searchMode: searchMode,
+                searchMatch: searchMatch,
             });
         } catch (e) {
             console.error(e);

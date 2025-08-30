@@ -13,6 +13,7 @@
     let showFileSizeSetting = false; // New global variable
     let searchCaseSensitive = false; // New global variable
     let searchMode = 'filter'; // New global variable
+    let searchMatch = 'startsWith'; // New global variable
 
     // Signal that the webview is ready
     vscode.postMessage({ type: 'ready' });
@@ -26,6 +27,7 @@
                 showFileSizeSetting = message.showFileSize; // Store the setting
                 searchCaseSensitive = message.searchCaseSensitive; // Store the setting
                 searchMode = message.searchMode; // Store the setting
+                searchMatch = message.searchMatch; // Store the setting
                 renderFileList(files);
                 currentDirElement.textContent = message.currentDir;
                 if (message.selectedIndex) {
@@ -39,6 +41,7 @@
                 showFileSizeSetting = message.showFileSize;
                 searchCaseSensitive = message.searchCaseSensitive;
                 searchMode = message.searchMode;
+                searchMatch = message.searchMatch;
                 renderFileList(files);
                 // Re-apply the search
                 const event = new Event('input');
@@ -171,18 +174,23 @@
         }
     });
 
+    function matches(f, searchTerm) {
+        const fileName = searchCaseSensitive ? f.name : f.name.toLowerCase();
+        const term = searchCaseSensitive ? searchTerm : searchTerm.toLowerCase();
+
+        if (searchMatch === 'in') {
+            return fileName.includes(term);
+        }
+        return fileName.startsWith(term);
+    }
+
     searchBox.addEventListener('input', e => {
         const searchTerm = e.target.value;
 
         if (searchMode === 'filter') {
             const previouslySelectedFile = renderedFiles[selectedIndex];
 
-            const filteredFiles = files.filter(f => {
-                if (searchCaseSensitive) {
-                    return f.name.startsWith(searchTerm);
-                }
-                return f.name.toLowerCase().startsWith(searchTerm.toLowerCase());
-            });
+            const filteredFiles = files.filter(f => matches(f, searchTerm));
             renderFileList(filteredFiles);
 
             let newSelectedIndex = -1;
@@ -200,12 +208,7 @@
                 updateSelection();
             }
         } else { // searchMode === 'search'
-            const foundIndex = files.findIndex(f => {
-                if (searchCaseSensitive) {
-                    return f.name.startsWith(searchTerm);
-                }
-                return f.name.toLowerCase().startsWith(searchTerm.toLowerCase());
-            });
+            const foundIndex = files.findIndex(f => matches(f, searchTerm));
 
             if (foundIndex !== -1) {
                 selectedIndex = foundIndex;
