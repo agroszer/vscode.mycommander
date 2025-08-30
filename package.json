@@ -2,7 +2,7 @@
   "name": "mycommander",
   "displayName": "mycommander",
   "description": "single panel file manager",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.103.0"
   },
@@ -64,7 +64,7 @@
         "myCommander.showFileSize": {
           "type": "boolean",
           "default": false,
-          "description": "Whether to show file sizes in the file explorer."
+          "description": "Whether to show file sizes in the file explorer on the right."
         },
         "myCommander.searchCaseSensitive": {
           "type": "boolean",
