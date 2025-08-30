@@ -44,6 +44,15 @@
           "type": "boolean",
           "default": false,
           "description": "Whether the search in the file explorer is case sensitive."
+        },
+        "myCommander.searchMode": {
+          "type": "string",
+          "default": "filter",
+          "enum": [
+            "filter",
+            "search"
+          ],
+          "description": "The search mode. \"filter\" will only show matching items. \"search\" will show all items and select the first match."
         }
       }
     }

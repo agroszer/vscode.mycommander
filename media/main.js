@@ -12,6 +12,7 @@
     let selectedIndex = 0;
     let showFileSizeSetting = false; // New global variable
     let searchCaseSensitive = false; // New global variable
+    let searchMode = 'filter'; // New global variable
 
     // Signal that the webview is ready
     vscode.postMessage({ type: 'ready' });
@@ -24,6 +25,7 @@
                 files = message.files;
                 showFileSizeSetting = message.showFileSize; // Store the setting
                 searchCaseSensitive = message.searchCaseSensitive; // Store the setting
+                searchMode = message.searchMode; // Store the setting
                 renderFileList(files);
                 currentDirElement.textContent = message.currentDir;
                 if (message.selectedIndex) {
@@ -161,30 +163,46 @@
     });
 
     searchBox.addEventListener('input', e => {
-        const previouslySelectedFile = renderedFiles[selectedIndex];
-
         const searchTerm = e.target.value;
-        const filteredFiles = files.filter(f => {
-            if (searchCaseSensitive) {
-                return f.name.startsWith(searchTerm);
+
+        if (searchMode === 'filter') {
+            const previouslySelectedFile = renderedFiles[selectedIndex];
+
+            const filteredFiles = files.filter(f => {
+                if (searchCaseSensitive) {
+                    return f.name.startsWith(searchTerm);
+                }
+                return f.name.toLowerCase().startsWith(searchTerm.toLowerCase());
+            });
+            renderFileList(filteredFiles);
+
+            let newSelectedIndex = -1;
+            if (previouslySelectedFile) {
+                newSelectedIndex = filteredFiles.findIndex(f => f.name === previouslySelectedFile.name);
             }
-            return f.name.toLowerCase().startsWith(searchTerm.toLowerCase());
-        });
-        renderFileList(filteredFiles);
 
-        let newSelectedIndex = -1;
-        if (previouslySelectedFile) {
-            newSelectedIndex = filteredFiles.findIndex(f => f.name === previouslySelectedFile.name);
-        }
+            if (newSelectedIndex !== -1) {
+                selectedIndex = newSelectedIndex;
+            } else {
+                selectedIndex = 0;
+            }
 
-        if (newSelectedIndex !== -1) {
-            selectedIndex = newSelectedIndex;
-        } else {
-            selectedIndex = 0;
-        }
+            if (filteredFiles.length > 0) {
+                updateSelection();
+            }
+        } else { // searchMode === 'search'
+            renderFileList(files); // Render all files
+            const foundIndex = files.findIndex(f => {
+                if (searchCaseSensitive) {
+                    return f.name.startsWith(searchTerm);
+                }
+                return f.name.toLowerCase().startsWith(searchTerm.toLowerCase());
+            });
 
-        if (filteredFiles.length > 0) {
-            updateSelection();
+            if (foundIndex !== -1) {
+                selectedIndex = foundIndex;
+                updateSelection();
+            }
         }
     });
 
