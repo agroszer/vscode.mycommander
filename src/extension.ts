@@ -31,6 +31,17 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.commands.executeCommand('workbench.action.openSettings', 'myCommander');
         })
     );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('myCommander.revealInExplorer', () => {
+            const activeEditor = vscode.window.activeTextEditor;
+            if (activeEditor && activeEditor.document.uri) {
+                fileExplorerProvider.revealFile(activeEditor.document.uri);
+            } else {
+                vscode.window.showInformationMessage('No active editor or document to reveal.');
+            }
+        })
+    );
 }
 
 // This method is called when your extension is deactivated

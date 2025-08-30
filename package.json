@@ -42,6 +42,11 @@
         "command": "myCommander.openSettings",
         "title": "Open Settings",
         "icon": "$(settings-gear)"
+      },
+      {
+        "command": "myCommander.revealInExplorer",
+        "title": "Reveal in Explorer",
+        "icon": "$(arrow-left)"
       }
     ],
     "menus": {
@@ -53,6 +58,11 @@
         },
         {
           "command": "myCommander.openSettings",
+          "when": "view == myCommander.fileExplorer",
+          "group": "navigation"
+        },
+        {
+          "command": "myCommander.revealInExplorer",
           "when": "view == myCommander.fileExplorer",
           "group": "navigation"
         }

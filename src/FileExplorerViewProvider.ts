@@ -7,6 +7,7 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;
     private _currentDir: string = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
     private _folderToSelect?: string;
+    private _fileToSelect?: string; // New property to store the file name to select
     private _rootPath: string = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
 
     constructor(private readonly _extensionUri: vscode.Uri) {}
@@ -59,6 +60,12 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                     this.updateFileList();
                     break;
                 }
+                case 'executeCommand': { // New case
+                    if (data.command) {
+                        vscode.commands.executeCommand(data.command);
+                    }
+                    break;
+                }
             }
         });
 
@@ -86,6 +93,31 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
             searchMode: searchMode,
             searchMatch: searchMatch,
         });
+    }
+
+    public async revealFile(fileUri: vscode.Uri) {
+        if (!this._view) {
+            return;
+        }
+
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        if (!workspaceFolders || workspaceFolders.length === 0) {
+            vscode.window.showInformationMessage('No workspace folder open to reveal file in.');
+            return;
+        }
+
+        const workspaceRoot = workspaceFolders[0].uri.fsPath;
+        const filePath = fileUri.fsPath;
+
+        // Check if the file is within the current workspace
+        if (!filePath.startsWith(workspaceRoot)) {
+            vscode.window.showInformationMessage('File is not within the current workspace.');
+            return;
+        }
+
+        this._currentDir = path.dirname(filePath);
+        this._fileToSelect = path.basename(filePath);
+        this.updateFileList();
     }
 
     public async updateFileList() {
@@ -133,6 +165,12 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                     selectedIndex = index;
                 }
                 this._folderToSelect = undefined;
+            } else if (this._fileToSelect) { // New logic for file selection
+                const index = fileList.findIndex(f => f.name === this._fileToSelect);
+                if (index !== -1) {
+                    selectedIndex = index;
+                }
+                this._fileToSelect = undefined; // Clear after selection
             }
 
             let displayCurrentDir = this._currentDir;
