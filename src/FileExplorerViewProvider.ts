@@ -39,7 +39,10 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                         this.updateFileList();
                     } else {
                         const document = await vscode.workspace.openTextDocument(filePath);
-                        await vscode.window.showTextDocument(document, { preview: false });
+                        await vscode.window.showTextDocument(document, {
+                            preview: false,
+                            preserveFocus: data.preserveFocus === true
+                        });
                     }
                     break;
                 }

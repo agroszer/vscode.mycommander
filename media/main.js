@@ -160,10 +160,18 @@
                 break;
             case 'Enter':
             case 'ArrowRight':
+            case 'F4':
                 e.preventDefault();
                 const selectedFile = renderedFiles[selectedIndex];
                 if (selectedFile) {
                     vscode.postMessage({ type: 'open', fileName: selectedFile.name });
+                }
+                break;
+            case 'F3': // New case for F3
+                e.preventDefault();
+                const selectedFileF3 = renderedFiles[selectedIndex];
+                if (selectedFileF3) {
+                    vscode.postMessage({ type: 'open', fileName: selectedFileF3.name, preserveFocus: true });
                 }
                 break;
             case 'Escape':
