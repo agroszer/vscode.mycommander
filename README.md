@@ -21,3 +21,6 @@ Twin panel file manager like file browser for VS Code. Well just one panel, but 
 ### 1.0.0
 
 Initial release of ...
+
+
+Special thanks go to Google Gemini
