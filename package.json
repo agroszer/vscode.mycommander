@@ -98,7 +98,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "publish": "./publish.sh"
   },
   "devDependencies": {
     "@types/vscode": "^1.103.0",
@@ -109,6 +110,7 @@
     "eslint": "^9.32.0",
     "typescript": "^5.9.2",
     "@vscode/test-cli": "^0.0.11",
-    "@vscode/test-electron": "^2.5.2"
+    "@vscode/test-electron": "^2.5.2",
+    "vsce": "^2.11.0"
   }
 }
