@@ -1,4 +1,3 @@
-
 import * as vscode from 'vscode';
 import * as path from 'path';
 
@@ -29,7 +28,7 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(async (data) => {
             switch (data.type) {
                 case 'ready': {
-                    this._updateFileList();
+                    this.updateFileList();
                     break;
                 }
                 case 'open': {
@@ -37,7 +36,7 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                     const stat = await vscode.workspace.fs.stat(vscode.Uri.file(filePath));
                     if (stat.type === vscode.FileType.Directory) {
                         this._currentDir = filePath;
-                        this._updateFileList();
+                        this.updateFileList();
                     } else {
                         const document = await vscode.workspace.openTextDocument(filePath);
                         await vscode.window.showTextDocument(document, { preview: false });
@@ -48,13 +47,13 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                     if (this._currentDir !== this._rootPath) {
                         this._folderToSelect = path.basename(this._currentDir);
                         this._currentDir = path.dirname(this._currentDir);
-                        this._updateFileList();
+                        this.updateFileList();
                     }
                     break;
                 }
                 case 'goToRoot': {
                     this._currentDir = this._rootPath;
-                    this._updateFileList();
+                    this.updateFileList();
                     break;
                 }
             }
@@ -86,7 +85,7 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
         });
     }
 
-    private async _updateFileList() {
+    public async updateFileList() {
         if (!this._view) {
             return;
         }

@@ -32,6 +32,32 @@
         }
       ]
     },
+    "commands": [
+      {
+        "command": "myCommander.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "myCommander.openSettings",
+        "title": "Open Settings",
+        "icon": "$(settings-gear)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "myCommander.refresh",
+          "when": "view == myCommander.fileExplorer",
+          "group": "navigation"
+        },
+        {
+          "command": "myCommander.openSettings",
+          "when": "view == myCommander.fileExplorer",
+          "group": "navigation"
+        }
+      ]
+    },
     "configuration": {
       "title": "My Commander Configuration",
       "properties": {

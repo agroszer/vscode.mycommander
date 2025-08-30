@@ -11,12 +11,26 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "mycommander" is now active!');
 
+    const fileExplorerProvider = new FileExplorerViewProvider(context.extensionUri);
+
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(
 			FileExplorerViewProvider.viewType,
-			new FileExplorerViewProvider(context.extensionUri)
+			fileExplorerProvider
 		)
 	);
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('myCommander.refresh', () => {
+            fileExplorerProvider.updateFileList();
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('myCommander.openSettings', () => {
+            vscode.commands.executeCommand('workbench.action.openSettings', 'myCommander');
+        })
+    );
 }
 
 // This method is called when your extension is deactivated
