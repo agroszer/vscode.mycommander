@@ -35,6 +35,15 @@
                 }
                 updateSelection();
                 break;
+            case 'settingsUpdate':
+                showFileSizeSetting = message.showFileSize;
+                searchCaseSensitive = message.searchCaseSensitive;
+                searchMode = message.searchMode;
+                renderFileList(files);
+                // Re-apply the search
+                const event = new Event('input');
+                searchBox.dispatchEvent(event);
+                break;
         }
     });
 
@@ -191,7 +200,6 @@
                 updateSelection();
             }
         } else { // searchMode === 'search'
-            renderFileList(files); // Render all files
             const foundIndex = files.findIndex(f => {
                 if (searchCaseSensitive) {
                     return f.name.startsWith(searchTerm);

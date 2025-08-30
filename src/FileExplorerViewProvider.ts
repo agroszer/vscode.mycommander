@@ -59,6 +59,29 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                 }
             }
         });
+
+        vscode.workspace.onDidChangeConfiguration(e => {
+            if (e.affectsConfiguration('myCommander')) {
+                this._updateSettings();
+            }
+        });
+    }
+
+    private _updateSettings() {
+        if (!this._view) {
+            return;
+        }
+
+        const showFileSize = vscode.workspace.getConfiguration('myCommander').get('showFileSize', false);
+        const searchCaseSensitive = vscode.workspace.getConfiguration('myCommander').get('searchCaseSensitive', false);
+        const searchMode = vscode.workspace.getConfiguration('myCommander').get('searchMode', 'filter');
+
+        this._view.webview.postMessage({
+            type: 'settingsUpdate',
+            showFileSize: showFileSize,
+            searchCaseSensitive: searchCaseSensitive,
+            searchMode: searchMode,
+        });
     }
 
     private async _updateFileList() {
