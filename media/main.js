@@ -135,6 +135,11 @@
         }
 
         if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+            if (e.key === '/') {
+                e.preventDefault();
+                vscode.postMessage({ type: 'goToRoot' });
+                return;
+            }
             e.preventDefault();
             searchBox.value += e.key;
             searchBox.dispatchEvent(new Event('input'));
@@ -152,6 +157,26 @@
             case 'ArrowDown':
                 e.preventDefault();
                 selectedIndex = (selectedIndex < renderedFiles.length - 1) ? selectedIndex + 1 : renderedFiles.length - 1;
+                updateSelection();
+                break;
+            case 'Home':
+                e.preventDefault();
+                selectedIndex = 0;
+                updateSelection();
+                break;
+            case 'End':
+                e.preventDefault();
+                selectedIndex = renderedFiles.length - 1;
+                updateSelection();
+                break;
+            case 'PageUp':
+                e.preventDefault();
+                selectedIndex = (selectedIndex > 15) ? selectedIndex - 15 : 0;
+                updateSelection();
+                break;
+            case 'PageDown':
+                e.preventDefault();
+                selectedIndex = (selectedIndex < renderedFiles.length - 15) ? selectedIndex + 15 : renderedFiles.length - 1;
                 updateSelection();
                 break;
             case 'ArrowLeft':
