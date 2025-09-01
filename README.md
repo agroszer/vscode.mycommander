@@ -8,6 +8,9 @@ Twin panel file manager like file browser for VS Code. Well just one panel, but 
 * Search for dirs or files by starting to type
 * Navigate folder with the left/right arrows, enter
 * Open a file with the right arrow or enter
+* To add a hotkey to set focus:
+
+  `{"key": "ctrl+o", "command": "workbench.view.extension.my-commander-container"}`
 
 ## Extension Settings
 
