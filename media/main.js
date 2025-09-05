@@ -204,6 +204,16 @@
                 searchBox.value = '';
                 searchBox.dispatchEvent(new Event('input'));
                 break;
+            case 'F7':
+                e.preventDefault();
+                vscode.postMessage({ type: 'findFiles' });
+                break;
+            case 's':
+                if (e.ctrlKey) {
+                    e.preventDefault();
+                    vscode.postMessage({ type: 'findFiles' });
+                }
+                break;
         }
     });
 

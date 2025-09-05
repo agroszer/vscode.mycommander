@@ -66,6 +66,16 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                     }
                     break;
                 }
+                case 'findFiles': {
+                    // This opens the "Find in Files" view and scopes it to the current directory.
+                    // The user can then type a filename in the search input.
+                    vscode.commands.executeCommand('workbench.action.findInFiles', { 
+                        filesToInclude: this._currentDir,
+                        showIncludesExcludes: true,
+                        query: ''
+                    });
+                    break;
+                }
             }
         });
 

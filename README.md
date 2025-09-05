@@ -5,9 +5,11 @@ Twin panel file manager like file browser for VS Code. Well just one panel, but 
 ## Features
 
 * List dirs and files, but not in a tree. The stock VS Code explorer drives me nuts.
-* Search for dirs or files by starting to type
+* Search for dirs or files by starting to type (works a lot better without a tree)
 * Navigate folder with the left/right arrows, enter
-* Open a file with the right arrow or enter
+* Open a file with the right arrow, F4 or enter, set focus to the editor
+* Open a file with F3, keeps the focus on the sidebar
+* Ctrl+S or F7: open the find in files sidebar with the current folder
 * To add a hotkey to set focus:
 
   `{"key": "ctrl+o", "command": "workbench.view.extension.my-commander-container"}`
