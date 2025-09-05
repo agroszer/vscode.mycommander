@@ -5,14 +5,19 @@
     const currentDirElement = document.getElementById('current-dir');
     const goUpButton = document.getElementById('go-up-button');
     const goRootButton = document.getElementById('go-root-button');
+    const tabList = document.getElementById('tab-list');
+    const addTabButton = document.getElementById('add-tab-button');
 
     let files = [];
     let renderedFiles = [];
     let selectedIndex = 0;
-    let rightColumnSetting = 'nothing'; // New global variable
-    let searchCaseSensitive = false; // New global variable
-    let searchMode = 'filter'; // New global variable
-    let searchMatch = 'startsWith'; // New global variable
+    let rightColumnSetting = 'nothing';
+    let searchCaseSensitive = false;
+    let searchMode = 'filter';
+    let searchMatch = 'startsWith';
+    let tabs = [];
+    let activeTab = '';
+    let rootPath = '';
 
     // Signal that the webview is ready
     vscode.postMessage({ type: 'ready' });
@@ -23,12 +28,16 @@
             case 'fileList':
                 searchBox.value = '';
                 files = message.files;
-                rightColumnSetting = message.rightColumn; // Store the setting
-                searchCaseSensitive = message.searchCaseSensitive; // Store the setting
-                searchMode = message.searchMode; // Store the setting
-                searchMatch = message.searchMatch; // Store the setting
+                rightColumnSetting = message.rightColumn;
+                searchCaseSensitive = message.searchCaseSensitive;
+                searchMode = message.searchMode;
+                searchMatch = message.searchMatch;
+                tabs = message.tabs;
+                activeTab = message.activeTab;
+                rootPath = message.rootPath;
                 renderFileList(files);
-                currentDirElement.textContent = message.currentDir;
+                renderTabs();
+                
                 if (message.selectedIndex) {
                     selectedIndex = message.selectedIndex;
                 } else {
@@ -43,10 +52,57 @@
                 searchMatch = message.searchMatch;
                 renderFileList(files);
                 // Re-apply the search
-                const event = new Event('input');
-                searchBox.dispatchEvent(event);
+                const e = new Event('input');
+                searchBox.dispatchEvent(e);
                 break;
         }
+    });
+
+    function renderTabs() {
+        tabList.innerHTML = '';
+        tabs.forEach((tab, i) => { // Added 'i' for index
+            const tabItem = document.createElement('li');
+            tabItem.className = 'tab-item';
+            tabItem.tabIndex = i + 2; // Set tabindex for each tab item
+            if (tab === activeTab) {
+                tabItem.classList.add('active');
+            }
+            tabItem.dataset.path = tab;
+
+            const tabName = document.createElement('span');
+            let relativePath = tab;
+            if (rootPath && tab.startsWith(rootPath)) {
+                relativePath = tab.substring(rootPath.length);
+                if (relativePath.startsWith('/') || relativePath.startsWith('\\')) {
+                    relativePath = relativePath.substring(1);
+                }
+                if (relativePath === '') {
+                    relativePath = '.';
+                }
+            }
+            tabName.textContent = relativePath;
+            tabItem.appendChild(tabName);
+
+            const closeButton = document.createElement('span');
+            closeButton.className = 'tab-close-button';
+            closeButton.textContent = 'x';
+            closeButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                vscode.postMessage({ type: 'removeTab', tab: tab });
+            });
+            tabItem.appendChild(closeButton);
+
+            tabItem.addEventListener('click', () => {
+                vscode.postMessage({ type: 'switchTab', tab: tab });
+            });
+
+            tabList.appendChild(tabItem);
+        });
+    }
+
+    addTabButton.tabIndex = 1; // Set tabindex for the add tab button
+    addTabButton.addEventListener('click', () => {
+        vscode.postMessage({ type: 'addTab' });
     });
 
     function renderFileList(filesToRender) {
@@ -90,6 +146,7 @@
             fileList.appendChild(listItem);
         });
         fileList.focus();
+        updateSelection();
     }
 
     function formatSize(bytes) {
@@ -277,5 +334,7 @@
     window.addEventListener('focus', () => {
         fileList.focus();
     });
+
+    
 
 }());

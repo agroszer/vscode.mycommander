@@ -9,8 +9,9 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
     private _folderToSelect?: string;
     private _fileToSelect?: string; // New property to store the file name to select
     private _rootPath: string = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
+    private _tabs: string[] = [];
 
-    constructor(private readonly _extensionUri: vscode.Uri) {}
+    constructor(private readonly _extensionUri: vscode.Uri, private readonly _context: vscode.ExtensionContext) {}
 
     public resolveWebviewView(
         webviewView: vscode.WebviewView,
@@ -18,6 +19,11 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
         _token: vscode.CancellationToken,
     ) {
         this._view = webviewView;
+        this._tabs = this._context.workspaceState.get('myCommander.tabs', [this._rootPath]);
+        if (this._tabs.length > 0) {
+            this._currentDir = this._tabs[0];
+        }
+
 
         webviewView.webview.options = {
             enableScripts: true,
@@ -36,8 +42,7 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                     const filePath = path.join(this._currentDir, data.fileName);
                     const stat = await vscode.workspace.fs.stat(vscode.Uri.file(filePath));
                     if (stat.type === vscode.FileType.Directory) {
-                        this._currentDir = filePath;
-                        this.updateFileList();
+                        this._updateCurrentDirAndTab(filePath);
                     } else {
                         const document = await vscode.workspace.openTextDocument(filePath);
                         await vscode.window.showTextDocument(document, {
@@ -49,15 +54,12 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                 }
                 case 'goUp': {
                     if (this._currentDir !== this._rootPath) {
-                        this._folderToSelect = path.basename(this._currentDir);
-                        this._currentDir = path.dirname(this._currentDir);
-                        this.updateFileList();
+                        this._updateCurrentDirAndTab(path.dirname(this._currentDir), path.basename(this._currentDir));
                     }
                     break;
                 }
                 case 'goToRoot': {
-                    this._currentDir = this._rootPath;
-                    this.updateFileList();
+                    this._updateCurrentDirAndTab(this._rootPath);
                     break;
                 }
                 case 'executeCommand': { // New case
@@ -76,6 +78,34 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                     });
                     break;
                 }
+                case 'addTab': {
+                    const currentDir = this._currentDir;
+                    this._tabs.push(currentDir);
+                    this._context.workspaceState.update('myCommander.tabs', this._tabs);
+                    this.updateFileList();
+                    break;
+                }
+                case 'removeTab': {
+                    const tabToRemove = data.tab;
+                    const index = this._tabs.indexOf(tabToRemove);
+                    if (index !== -1) {
+                        this._tabs.splice(index, 1);
+                        if (this._tabs.length === 0) {
+                            this._tabs.push(this._rootPath);
+                        }
+                        this._context.workspaceState.update('myCommander.tabs', this._tabs);
+                        if (this._currentDir === tabToRemove) {
+                            this._currentDir = this._tabs[0];
+                        }
+                        this.updateFileList();
+                    }
+                    break;
+                }
+                case 'switchTab': {
+                    this._currentDir = data.tab;
+                    this.updateFileList();
+                    break;
+                }
             }
         });
 
@@ -84,6 +114,20 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                 this._updateSettings();
             }
         });
+    }
+
+    private _updateCurrentDirAndTab(newDir: string, folderToSelect?: string) {
+        const oldDir = this._currentDir;
+        this._currentDir = newDir;
+        if (folderToSelect) {
+            this._folderToSelect = folderToSelect;
+        }
+        const index = this._tabs.indexOf(oldDir);
+        if (index !== -1) {
+            this._tabs[index] = this._currentDir;
+            this._context.workspaceState.update('myCommander.tabs', this._tabs);
+        }
+        this.updateFileList();
     }
 
     private _updateSettings() {
@@ -183,16 +227,7 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                 this._fileToSelect = undefined; // Clear after selection
             }
 
-            let displayCurrentDir = this._currentDir;
-            if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
-                const workspaceRoot = vscode.workspace.workspaceFolders[0].uri.fsPath;
-                if (this._currentDir.startsWith(workspaceRoot)) {
-                    displayCurrentDir = path.relative(workspaceRoot, this._currentDir);
-                    if (displayCurrentDir === '') {
-                        displayCurrentDir = '.'; // Represent workspace root as '.'
-                    }
-                }
-            }
+            
 
             const rightColumn = vscode.workspace.getConfiguration('myCommander').get('rightColumn', 'nothing');
             const searchCaseSensitive = vscode.workspace.getConfiguration('myCommander').get('searchCaseSensitive', false);
@@ -202,12 +237,14 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
             this._view.webview.postMessage({
                 type: 'fileList',
                 files: fileList,
-                currentDir: displayCurrentDir,
                 selectedIndex: selectedIndex,
                 rightColumn: rightColumn, // Pass the setting to the webview
                 searchCaseSensitive: searchCaseSensitive,
                 searchMode: searchMode,
                 searchMatch: searchMatch,
+                tabs: this._tabs,
+                activeTab: this._currentDir,
+                rootPath: this._rootPath,
             });
         } catch (e) {
             console.error(e);
@@ -231,19 +268,22 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
 				<title>File Explorer</title>
 			</head>
 			<body>
-                <div id="header">
-                    <div id="header-row-1">
-                        <div id="nav-buttons">
-                            <button id="go-up-button">..</button>
-                            <button id="go-root-button">/</button>
-                        </div>
-                        <div id="current-dir"></div>
+                <div id="main-container">
+                    <div id="tab-bar">
+                        <button id="go-up-button">..</button>
+                        <button id="go-root-button">/</button>
+                        <button id="add-tab-button">add folder/tab</button>
+                        <ul id="tab-list"></ul>
                     </div>
-                    <div id="header-row-2">
-                        <input type="text" id="search-box" placeholder="Search..." />
+                    <div id="file-view">
+                        <div id="header">
+                            <div id="header-row-1">
+                                <input type="text" id="search-box" placeholder="Search..." />
+                            </div>
+                        </div>
+                        <ul id="file-list" tabindex="0"></ul>
                     </div>
                 </div>
-				<ul id="file-list" tabindex="0"></ul>
 				<script src="${scriptUriWithCacheBust}"></script>
 			</body>
 			</html>`;

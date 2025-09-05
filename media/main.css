@@ -16,6 +16,65 @@ body {
     height: 100vh;
 }
 
+#tab-bar {
+    padding: 4px;
+    background-color: var(--vscode-side-bar-background);
+    border-bottom: 1px solid var(--vscode-side-bar-border);
+}
+
+#add-tab-button,
+#go-up-button,
+#go-root-button {
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    border: 1px solid var(--vscode-button-border);
+    padding: 4px 8px;
+    cursor: pointer;
+    margin-right: 4px;
+}
+
+#add-tab-button:hover,
+#go-up-button:hover,
+#go-root-button:hover {
+    background-color: var(--vscode-button-hover-background);
+}
+
+#tab-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.tab-item {
+    padding: 4px 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tab-item:hover {
+    background-color: var(--vscode-list-hover-background);
+}
+
+.tab-item.active {
+    background-color: #094771;
+    color: white;
+    border-left: 3px solid #007fd4;
+    padding-left: 5px;
+}
+
+.tab-close-button {
+    cursor: pointer;
+    padding: 0 4px;
+    margin-left: 8px;
+}
+
 #header {
     display: flex;
     flex-direction: column;
@@ -26,43 +85,7 @@ body {
 }
 
 #header-row-1 {
-    display: flex;
-    align-items: center;
     width: 100%;
-}
-
-#nav-buttons {
-    display: flex;
-    gap: 4px;
-}
-
-#nav-buttons button {
-    background-color: var(--vscode-button-background);
-    color: var(--vscode-button-foreground);
-    border: 1px solid var(--vscode-button-border);
-    padding: 2px 8px;
-    cursor: pointer;
-}
-
-#nav-buttons button:hover {
-    background-color: var(--vscode-button-hover-background);
-}
-
-#current-dir {
-    flex-grow: 1;
-    padding: 4px 8px;
-    font-size: 0.9em;
-    color: var(--vscode-description-foreground);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    direction: rtl;
-    text-align: left;
-}
-
-#header-row-2 {
-    width: 100%;
-    margin-top: 4px;
 }
 
 #search-box {

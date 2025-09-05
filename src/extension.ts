@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "mycommander" is now active!');
 
-    const fileExplorerProvider = new FileExplorerViewProvider(context.extensionUri);
+    const fileExplorerProvider = new FileExplorerViewProvider(context.extensionUri, context);
 
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(
