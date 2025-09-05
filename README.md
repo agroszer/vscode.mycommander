@@ -10,6 +10,7 @@ Twin panel file manager like file browser for VS Code. Well just one panel, but 
 * Open a file with the right arrow, F4 or enter, set focus to the editor
 * Open a file with F3, keeps the focus on the sidebar
 * Ctrl+S or F7: open the find in files sidebar with the current folder
+* "Tab" / bookmark handling: add any number of tabs / bookmarks
 * To add a hotkey to set focus:
 
   `{"key": "ctrl+o", "command": "workbench.view.extension.my-commander-container"}`

@@ -163,6 +163,13 @@
             if (index === selectedIndex) {
                 item.classList.add('selected');
                 item.scrollIntoView({ block: 'nearest' });
+                // Send message to extension about the selected item
+                if (renderedFiles[selectedIndex]) {
+                    vscode.postMessage({
+                        type: 'selectionChanged',
+                        fileName: renderedFiles[selectedIndex].name
+                    });
+                }
             } else {
                 item.classList.remove('selected');
             }

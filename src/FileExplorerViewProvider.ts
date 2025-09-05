@@ -8,6 +8,7 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
     private _currentDir: string = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
     private _folderToSelect?: string;
     private _fileToSelect?: string; // New property to store the file name to select
+    private _lastSelectedItemName?: string; // Stores the name of the last selected item
     private _rootPath: string = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
     private _tabs: string[] = [];
 
@@ -104,6 +105,10 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                 case 'switchTab': {
                     this._currentDir = data.tab;
                     this.updateFileList();
+                    break;
+                }
+                case 'selectionChanged': {
+                    this._lastSelectedItemName = data.fileName;
                     break;
                 }
             }
@@ -225,6 +230,12 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                     selectedIndex = index;
                 }
                 this._fileToSelect = undefined; // Clear after selection
+            } else if (this._lastSelectedItemName) { // Restore last selected item
+                const index = fileList.findIndex(f => f.name === this._lastSelectedItemName);
+                if (index !== -1) {
+                    selectedIndex = index;
+                }
+                this._lastSelectedItemName = undefined; // Clear after use
             }
 
             
