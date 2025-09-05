@@ -16,7 +16,7 @@ Twin panel file manager like file browser for VS Code. Well just one panel, but 
 
 ## Extension Settings
 
-* `myCommander.showFileSize`: Whether to show file sizes in the file explorer on the right.
+* `myCommander.rightColumn`: What to show in the right column: `nothing`, `extension`, or `size`.
 * `myCommander.searchCaseSensitive`: Whether the search in the file explorer is case sensitive.
 * `myCommander.searchMode`: The search mode. "filter" will only show matching items. "search" will show all items and select the first match.
 * `myCommander.searchMatch`: The search match mode. "startsWith" will match the beginning of the item name. "in" will match anywhere in the item name.

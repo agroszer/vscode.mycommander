@@ -1,4 +1,3 @@
-
 (function () {
     const vscode = acquireVsCodeApi();
     const fileList = document.getElementById('file-list');
@@ -10,7 +9,7 @@
     let files = [];
     let renderedFiles = [];
     let selectedIndex = 0;
-    let showFileSizeSetting = false; // New global variable
+    let rightColumnSetting = 'nothing'; // New global variable
     let searchCaseSensitive = false; // New global variable
     let searchMode = 'filter'; // New global variable
     let searchMatch = 'startsWith'; // New global variable
@@ -24,7 +23,7 @@
             case 'fileList':
                 searchBox.value = '';
                 files = message.files;
-                showFileSizeSetting = message.showFileSize; // Store the setting
+                rightColumnSetting = message.rightColumn; // Store the setting
                 searchCaseSensitive = message.searchCaseSensitive; // Store the setting
                 searchMode = message.searchMode; // Store the setting
                 searchMatch = message.searchMatch; // Store the setting
@@ -38,7 +37,7 @@
                 updateSelection();
                 break;
             case 'settingsUpdate':
-                showFileSizeSetting = message.showFileSize;
+                rightColumnSetting = message.rightColumn;
                 searchCaseSensitive = message.searchCaseSensitive;
                 searchMode = message.searchMode;
                 searchMatch = message.searchMatch;
@@ -67,11 +66,25 @@
 
             listItem.appendChild(nameSpan);
 
-            if (showFileSizeSetting) { // Conditionally create and append sizeSpan
+            if (rightColumnSetting === 'size') {
                 const sizeSpan = document.createElement('span');
                 sizeSpan.className = 'file-size';
                 sizeSpan.textContent = file.isDirectory ? '' : formatSize(file.size);
                 listItem.appendChild(sizeSpan);
+            } else if (rightColumnSetting === 'extension') {
+                const extSpan = document.createElement('span');
+                extSpan.className = 'file-extension';
+                if (!file.isDirectory) {
+                    const lastDot = file.name.lastIndexOf('.');
+                    if (lastDot > 0 && lastDot < file.name.length - 1) {
+                        nameSpan.textContent = file.name.substring(0, lastDot);
+                        extSpan.textContent = file.name.substring(lastDot + 1);
+                    } else if (lastDot === 0 && file.name.length > 1) {
+                        nameSpan.textContent = '.';
+                        extSpan.textContent = file.name.substring(1);
+                    }
+                }
+                listItem.appendChild(extSpan);
             }
 
             fileList.appendChild(listItem);

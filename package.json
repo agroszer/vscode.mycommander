@@ -71,10 +71,20 @@
     "configuration": {
       "title": "My Commander Configuration",
       "properties": {
-        "myCommander.showFileSize": {
-          "type": "boolean",
-          "default": false,
-          "description": "Whether to show file sizes in the file explorer on the right."
+        "myCommander.rightColumn": {
+          "type": "string",
+          "default": "nothing",
+          "description": "What to show in the right column: nothing, file extension, or file size.",
+          "enum": [
+            "nothing",
+            "extension",
+            "size"
+          ],
+          "enumDescriptions": [
+            "Do not show anything.",
+            "Show file extension.",
+            "Show file size."
+          ]
         },
         "myCommander.searchCaseSensitive": {
           "type": "boolean",

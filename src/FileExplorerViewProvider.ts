@@ -91,14 +91,14 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
             return;
         }
 
-        const showFileSize = vscode.workspace.getConfiguration('myCommander').get('showFileSize', false);
+        const rightColumn = vscode.workspace.getConfiguration('myCommander').get('rightColumn', 'nothing');
         const searchCaseSensitive = vscode.workspace.getConfiguration('myCommander').get('searchCaseSensitive', false);
         const searchMode = vscode.workspace.getConfiguration('myCommander').get('searchMode', 'filter');
         const searchMatch = vscode.workspace.getConfiguration('myCommander').get('searchMatch', 'startsWith');
 
         this._view.webview.postMessage({
             type: 'settingsUpdate',
-            showFileSize: showFileSize,
+            rightColumn: rightColumn,
             searchCaseSensitive: searchCaseSensitive,
             searchMode: searchMode,
             searchMatch: searchMatch,
@@ -194,7 +194,7 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                 }
             }
 
-            const showFileSize = vscode.workspace.getConfiguration('myCommander').get('showFileSize', false);
+            const rightColumn = vscode.workspace.getConfiguration('myCommander').get('rightColumn', 'nothing');
             const searchCaseSensitive = vscode.workspace.getConfiguration('myCommander').get('searchCaseSensitive', false);
             const searchMode = vscode.workspace.getConfiguration('myCommander').get('searchMode', 'filter');
             const searchMatch = vscode.workspace.getConfiguration('myCommander').get('searchMatch', 'startsWith');
@@ -204,7 +204,7 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
                 files: fileList,
                 currentDir: displayCurrentDir,
                 selectedIndex: selectedIndex,
-                showFileSize: showFileSize, // Pass the setting to the webview
+                rightColumn: rightColumn, // Pass the setting to the webview
                 searchCaseSensitive: searchCaseSensitive,
                 searchMode: searchMode,
                 searchMatch: searchMatch,
