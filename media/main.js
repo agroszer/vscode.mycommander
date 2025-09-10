@@ -211,14 +211,40 @@
             return;
         }
 
+        if (e.key === '/') {
+            e.preventDefault();
+            vscode.postMessage({ type: 'goToRoot' });
+            return;
+        }
+
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            vscode.postMessage({ type: 'goUp' });
+            return;
+        }
+
+        if (e.key === 'F7') {
+            e.preventDefault();
+            vscode.postMessage({ type: 'findFiles' });
+            return;
+        }
+
+        if (e.key === 's' && e.ctrlKey) {
+            e.preventDefault();
+            vscode.postMessage({ type: 'findFiles' });
+            return;
+        }
+
         if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
-            if (e.key === '/') {
-                e.preventDefault();
-                vscode.postMessage({ type: 'goToRoot' });
-                return;
-            }
             e.preventDefault();
             searchBox.value += e.key;
+            searchBox.dispatchEvent(new Event('input'));
+            return;
+        }
+
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            searchBox.value = '';
             searchBox.dispatchEvent(new Event('input'));
             return;
         }
@@ -256,10 +282,6 @@
                 selectedIndex = (selectedIndex < renderedFiles.length - 15) ? selectedIndex + 15 : renderedFiles.length - 1;
                 updateSelection();
                 break;
-            case 'ArrowLeft':
-                e.preventDefault();
-                vscode.postMessage({ type: 'goUp' });
-                break;
             case 'Enter':
             case 'ArrowRight':
             case 'F4':
@@ -274,21 +296,6 @@
                 const selectedFileF3 = renderedFiles[selectedIndex];
                 if (selectedFileF3) {
                     vscode.postMessage({ type: 'open', fileName: selectedFileF3.name, preserveFocus: true });
-                }
-                break;
-            case 'Escape':
-                e.preventDefault();
-                searchBox.value = '';
-                searchBox.dispatchEvent(new Event('input'));
-                break;
-            case 'F7':
-                e.preventDefault();
-                vscode.postMessage({ type: 'findFiles' });
-                break;
-            case 's':
-                if (e.ctrlKey) {
-                    e.preventDefault();
-                    vscode.postMessage({ type: 'findFiles' });
                 }
                 break;
         }
