@@ -16,6 +16,20 @@ body {
     height: 100vh;
 }
 
+#main-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+#file-view {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-height: 0;
+}
+
 #tab-bar {
     padding: 4px;
     background-color: var(--vscode-side-bar-background);
