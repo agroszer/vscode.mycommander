@@ -112,6 +112,10 @@ body {
     padding: 4px;
 }
 
+#search-box.no-results {
+    border-color: red;
+}
+
 #file-list {
     list-style: none;
     padding: 0;

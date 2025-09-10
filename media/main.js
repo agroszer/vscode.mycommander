@@ -320,6 +320,12 @@
             const filteredFiles = files.filter(f => matches(f, searchTerm));
             renderFileList(filteredFiles);
 
+            if (searchTerm && filteredFiles.length === 0) {
+                searchBox.classList.add('no-results');
+            } else {
+                searchBox.classList.remove('no-results');
+            }
+
             let newSelectedIndex = -1;
             if (previouslySelectedFile) {
                 newSelectedIndex = filteredFiles.findIndex(f => f.name === previouslySelectedFile.name);
@@ -340,6 +346,9 @@
             if (foundIndex !== -1) {
                 selectedIndex = foundIndex;
                 updateSelection();
+                searchBox.classList.remove('no-results');
+            } else {
+                searchBox.classList.add('no-results');
             }
         }
     });
@@ -348,7 +357,5 @@
     window.addEventListener('focus', () => {
         fileList.focus();
     });
-
-    
 
 }());
