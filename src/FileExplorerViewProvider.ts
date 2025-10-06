@@ -174,7 +174,26 @@ export class FileExplorerViewProvider implements vscode.WebviewViewProvider {
             return;
         }
 
-        this._currentDir = path.dirname(filePath);
+        const newDir = path.dirname(filePath);
+
+        // Find the 'current' tab and replace its path
+        const oldDir = this._currentDir;
+        let tabIndexToUpdate = -1;
+        let longestMatch = 0;
+        for (let i = 0; i < this._tabs.length; i++) {
+            if (oldDir.startsWith(this._tabs[i]) && this._tabs[i].length > longestMatch) {
+                longestMatch = this._tabs[i].length;
+                tabIndexToUpdate = i;
+            }
+        }
+
+        console.log(tabIndexToUpdate, this._tabs, oldDir);
+        if (tabIndexToUpdate !== -1) {
+            this._tabs[tabIndexToUpdate] = newDir;
+            this._context.workspaceState.update('myCommander.tabs', this._tabs);
+        }
+
+        this._currentDir = newDir;
         this._fileToSelect = path.basename(filePath);
         this.updateFileList();
     }
